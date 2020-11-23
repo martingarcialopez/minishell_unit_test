@@ -1,3 +1,5 @@
+#!/bin/bash
+
 TEST_ARRAY=(
 '################		    BUILTINS			#################'
 #### PWD ####
@@ -82,11 +84,9 @@ TEST_ARRAY=(
 'echo "party trick x2" >> d >> e >> f ; ls ; cat f'
 'notacommand >> a'
 'pwd >> dir'
-'ls >> a imnotaflag meneither')
+'ls >> a imnotaflag meneither'
 #'################	    LEFT REDIRECTION		    #################'
-
-
-
+)
 
 GREEN=$(tput setaf 2)
 RED=$(tput setaf 1)
@@ -100,8 +100,13 @@ if [[ ! -f ../Makefile ]]; then
     printf "\n${RED}aborting test...\n\n$NC"
     exit 1
 fi
+if [[ ! -f ../minishell ]]; then
+    printf "${RED}Error:$NC There is no executable called minishell in ../"
+    printf "\n\n${RED}aborting test...\n\n$NC"
+    exit 1 
+fi
 
-make -C ../
+make -C ..
 cp ../minishell .
 printf "copying your minishell to the current directory...\n"
 
@@ -126,9 +131,10 @@ do
     fi
     bash -c "$val" minishell &> x
     RET1=$?
-    rm -rf d e f
+    rm -rf a b c d e f
     ./minishell -c "$val" &> y
     RET2=$?
+    rm -rf a b c d e f
     DIFF=$(diff x y) 
     if [[ "$DIFF" == "" && $RET1 == $RET2 ]]
     then
@@ -146,4 +152,4 @@ done
 
 printf "\n\n\t\t\'cat diff.txt | less\'  for detailed information\n\n"
 
-rm -rf x y a b c d lscp ucantexecme.e dir dir/encoreuneautredir
+rm -rf minishell x y a b c d lscp ucantexecme.e dir dir/encoreuneautredir
