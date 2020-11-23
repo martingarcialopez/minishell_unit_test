@@ -95,7 +95,9 @@ ROSITA=$(tput setaf 5)
 NC=$(tput sgr0)
 
 if [[ ! -f ../Makefile ]]; then
-    printf "There is no Makefile to build your minishell in ../, aborting test...\n"
+    printf "${RED}Error:$NC There is no Makefile to build your minishell in ../"
+    printf "\nMake sure to clone this repo in the root of your project\n"
+    printf "\n${RED}aborting test...\n\n$NC"
     exit 1
 fi
 
