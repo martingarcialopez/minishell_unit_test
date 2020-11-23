@@ -10,12 +10,12 @@ TEST_ARRAY=(
 'echo hola buenos dias | cat -e'
 'echo -n hola que tal bocadillo digital | cat -e'
 #### ENV ####
-'env'
+#'env'
 #### EXPORT ####
 'export Z=z ; echo $Z'
 'export A=a B=b C=c; echo $A$B$C'
 'export z zz= zzz=asd ; echo $z$zz$zzz ; env ; export | grep z'
-'export _=a; echo $_'
+#'export _=a; echo $_'
 'export A=a=a=a=a=a; echo $A'
 'export A B C; echo $A$B$C'
 #### UNSET ####
@@ -28,8 +28,8 @@ TEST_ARRAY=(
 'cd .; pwd'
 'cd ..; pwd'
 'cd ..; pwd; echo $OLDPWD'
-'unset OLDPWD; cd - ; pwd; echo $OLDPWD'
-'cd ' /'; pwd'
+'unset OLDPWD; cd .. ; pwd; echo $OLDPWD'
+"cd ' /'; pwd"
 'cd ../../ ; pwd'
 'cd ../../../../../../.. ; pwd'
 'cd dirwithoutpermissions'
@@ -37,7 +37,7 @@ TEST_ARRAY=(
 'exit'
 'exit 42'
 'exit 21 42'
-'################		COMMAND EXECUTION	    #################'
+'################		COMMAND EXECUTION	        #################'
 'ls'
 '/bin/ls'
 './lscp'
@@ -46,11 +46,11 @@ TEST_ARRAY=(
 'df -h | head -2'
 'idontexist'
 './meneither'
-'./d1'
+'./dir'
 'touch ucantexecme.e ; chmod 000 ucantexecme.e ; ./ucantexecme.e'
-#'################		    PARSING		    #################'
+#'################		    PARSING		        #################'
 #';'
-'################		QUOTES			    #################'
+'################		    QUOTES			#################'
 'echo "$HOME"'
 "echo '\$HOME'"
 "echo \" '\$PWD' \\\"\$PWD\\\" '\$PWD' \""
@@ -59,11 +59,11 @@ TEST_ARRAY=(
 "echo \\\\\n"
 "echo \"semicolon will not ; stop me\""
 'bash -c "i am not a command" "im the program name"'
-'################		PIPES			    #################'
+'################		    PIPES			#################'
 'echo 5 + 3 | bc'
 'ls | wc | wc -l | bc'
 'echo "cat traveler" | cat | cat | cat | cat | cat | cat'
-'################	    RIGHT REDIRECTION		    #################'
+'################	        RIGHT REDIRECTION		#################'
 '> a ; ls'
 'pwd > a ; cat a'
 'ls > a -a ; cat a'
@@ -73,7 +73,7 @@ TEST_ARRAY=(
 'notacommand > a'
 'pwd > dir'
 'ls > a imnotaflag meneither; ls'
-'################	    DOUBLE REDIRECTION		    #################'
+'################	        DOUBLE REDIRECTION		#################'
 '>> a; ls'
 'pwd >> a; cat a'
 'echo double the redirection double the fun >> a ; cat a'
@@ -94,6 +94,7 @@ YELLOW=$(tput setaf 3)
 ROSITA=$(tput setaf 5)
 NC=$(tput sgr0)
 
+
 if [[ ! -f ../Makefile ]]; then
     printf "${RED}Error:$NC There is no Makefile to build your minishell in ../"
     printf "\nMake sure to clone this repo in the root of your project\n"
@@ -110,7 +111,7 @@ make -C ..
 cp ../minishell .
 printf "copying your minishell to the current directory...\n"
 
-rm -rf a b diff.txt
+rm diff.txt
 
 mkdir dir dir/encoreuneautredir
 printf "creating directories ${ROSITA}dir$NC, ${ROSITA}dir/encoreuneautredir$NC...\n"
@@ -121,7 +122,7 @@ fi
 cp $(which ls) lscp
 printf "%s\n" "copying ${ROSITA}$(which ls)$NC to ${ROSITA}lscp$NC..."
 
-printf "\n\t\t\t ${YELLOW}[  MINISHELL UNIT TEST  ]$NC\n\n\n"
+printf "\n\t\t\t    ${YELLOW}[ MINISHELL UNIT TEST ]$NC\n\n\n"
 
 for val in "${TEST_ARRAY[@]}"
 do
