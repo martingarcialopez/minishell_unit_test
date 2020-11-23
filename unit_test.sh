@@ -30,7 +30,7 @@ TEST_ARRAY=(
 'cd ' /'; pwd'
 'cd ../../ ; pwd'
 'cd ../../../../../../.. ; pwd'
-'mkdir -m 500 d ; cd d'
+'cd dirwithoutpermissions'
 #### EXIT ####
 'exit'
 'exit 42'
@@ -94,7 +94,14 @@ YELLOW=$(tput setaf 3)
 ROSITA=$(tput setaf 5)
 NC=$(tput sgr0)
 
-make
+if [[ ! -f ../Makefile ]]; then
+    printf "There is no Makefile to build your minishell in ../, aborting test...\n"
+    exit 1
+fi
+
+make -C ../
+cp ../minishell .
+printf "copying your minishell to the current directory...\n"
 
 rm -rf a b diff.txt
 
