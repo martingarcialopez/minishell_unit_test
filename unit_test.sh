@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TEST_ARRAY=(
-'################		    BUILTINS			#################'
+'##################		    BUILTINS			#################' # ${YELLOW}STDOUT STDERR$NC
 #### PWD ####
 'pwd'
 'unset PWD ; pwd'
@@ -47,6 +47,7 @@ TEST_ARRAY=(
 'cd dir ; ../lscp'
 'cd dir/encoreuneautredir ; ../../lscp'
 'df -h | head -2'
+'ls imnotaflag meneither'
 'idontexist'
 './meneither'
 './dir'
@@ -56,12 +57,11 @@ TEST_ARRAY=(
 '################		    QUOTES			#################'
 'echo "$HOME"'
 "echo '\$HOME'"
-"echo \" '\$PWD' \\\"\$PWD\\\" '\$PWD' \""
-"echo \"\\\$HOME\""
+"echo \" '\$PWD' \\\"\$PWD\\\" '\$PWD' \"" "echo \"\\\$HOME\""
 "echo \"'\$'\""
 "echo \\\\\n"
 "echo \"semicolon will not ; stop me\""
-'bash -c "i am not a command" "im the program name"'
+'bash -c "I am not a command" "Im the program name"'
 '################		    PIPES			#################'
 'echo 5 + 3 | bc'
 'ls | wc | wc -l | bc'
@@ -69,22 +69,22 @@ TEST_ARRAY=(
 '################	        RIGHT REDIRECTION		#################'
 '> a ; ls'
 'pwd > a ; cat a'
-'ls > a -a ; cat a'
+'ls > a -f ; cat a'
 'echo entre el clavel y la rosa > a su majestad es coja; cat a'
 '> a echo cucu cantaba la rana; cat a'
 'echo "redirection party trick" > a > b > c > d ; ls ; cat d'
 'notacommand > a'
 'pwd > dir'
-'ls > a imnotaflag meneither; ls'
+'ls > a imnotaflag meneither'
 '################	        DOUBLE REDIRECTION		#################'
 '>> a; ls'
 'pwd >> a; cat a'
 'echo double the redirection double the fun >> a ; cat a'
 'pwd >> a ; echo apendicitis >> a ; cat a'
-'pwd >> a ; ls >> a -a ; cat a'
+'pwd >> a ; ls >> a -f ; cat a'
 'echo entre el clavel y la rosa >> a su majestad es coja ; cat a'
 '>> a echo cucu cantaba la rana; cat a'
-'echo "party trick x2" >> d >> e >> f ; ls ; cat f'
+'echo "party trick x2" >> a >> b >> c >> d ; ls ; cat d'
 'notacommand >> a'
 'pwd >> dir'
 'ls >> a imnotaflag meneither'
@@ -95,6 +95,11 @@ GREEN=$(tput setaf 2)
 RED=$(tput setaf 1)
 YELLOW=$(tput setaf 3)
 ROSITA=$(tput setaf 5)
+BLUE=$(tput setaf 4)
+VERDEKTSALTAALACARA=$(tput setaf 10)
+ROJOKTSALTAALACARA=$(tput setaf 196)
+MARRONMIERDA=$(tput setaf 8)
+COLORBONITO=$(tput setaf 12)
 NC=$(tput sgr0)
 
 
@@ -127,33 +132,63 @@ printf "%s\n" "copying ${ROSITA}$(which ls)$NC to ${ROSITA}lscp$NC..."
 
 printf "\n\t\t\t    ${YELLOW}[ MINISHELL UNIT TEST ]$NC\n\n\n"
 
+
+
 for val in "${TEST_ARRAY[@]}"
 do
     if [[ "$val" == *####* ]]; then
-	printf "%s\n" "${NC}$val"
+	printf "%s" "${NC}$val"
+	printf " ${COLORBONITO}STDERR$NC\n"
 	continue 
     fi
-    bash -c "$val" minishell &> x
+    bash -c "$val" minishell > out1 2> err1
     RET1=$?
-    rm -rf a b c d e f
-    ./minishell -c "$val" &> y
+    rm -rf a b c d
+    ./minishell -c "$val" > out2 2> err2
     RET2=$?
-    rm -rf a b c d e f
-    DIFF=$(diff x y) 
+    rm -rf a b c d
+    DIFF=$(diff out1 out2) 
+    ERRDIFF=$(diff err1 err2)
+
+    if [[ "$DIFF" != "" || $RET1 != $RET2 || $ERRDIFF != ""  ]]
+    then
+	printf "%s\n" "${YELLOW}$val$NC" >> diff.txt
+	printf "${ROSITA}< bash       (exited with %d)$NC\n" "$RET1" >> diff.txt
+	printf "${ROSITA}> minishell  (exited with %d)\n$NC" "$RET2" >> diff.txt
+    fi
+
     if [[ "$DIFF" == "" && $RET1 == $RET2 ]]
     then
-	printf "%-80s[PASS]$NC\n" "${GREEN}$val"
+	printf "%-80s[PASS] [$NC" "${GREEN}$val"
     else
-	printf "%-80s[FAIL]$NC\n" "${RED}$val"
-	printf "%s\n" "${YELLOW}$val$NC" >> diff.txt
-	printf "$ROSITA< bash       (exited with %d)$NC\n" "$RET1" >> diff.txt
-	printf "$ROSITA> minishell  (exited with %d)\n---$NC" "$RET2" >> diff.txt
-	diff x y >> diff.txt
-	printf "%s\n\n" '---1c1' >> diff.txt
+	printf "%-80s[FAIL] [$NC" "${RED}$val"
+	if [[ "$DIFF" != "" ]]; then
+		printf "%s\n" "${COLORBONITO}----- STDOUT -----$NC" >> diff.txt
+		diff out1 out2 >> diff.txt
+	fi
     fi
-    rm -rf a b c d e f
+
+    if [[ "$ERRDIFF" == "" ]]
+    then
+	printf "    "
+    else
+	printf "${MARRONMIERDA}FAIL$NC"
+	printf "%s\n" "$COLORBONITO----- STDERR -----$NC" >> diff.txt
+	diff -Bbw err1 err2 >> diff.txt
+    fi
+
+    if [[ "$DIFF" != "" || $RET1 != $RET2 || $ERRDIFF != ""  ]]
+    then
+	printf "\n\n" >> diff.txt
+    fi
+
+    if [[ "$DIFF" == "" && $RET1 == $RET2 ]]; then
+	    printf "${GREEN}]$NC\n"
+	else
+	    printf "${RED}]$NC\n"
+    fi
 done
 
 printf "\n\n\t\t\'cat diff.txt | less\'  for detailed information\n\n"
 
-rm -rf minishell x y a b c d lscp ucantexecme.e dir dir/encoreuneautredir
+rm -rf minishell out1 out2 err1 err2 a b c d lscp ucantexecme.e dir dir/encoreuneautredir
