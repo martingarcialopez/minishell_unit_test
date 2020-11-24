@@ -191,4 +191,6 @@ done
 
 printf "\n\n\t\t\'cat diff.txt | less\'  for detailed information\n\n"
 
-rm -rf minishell out1 out2 err1 err2 a b c d lscp ucantexecme.e dir dir/encoreuneautredir
+rm -rf minishell out1 out2 err1 err2 a b c d lscp
+chmod +r dirwithoutpermissions
+rm -rf ucantexecme.e dir dir/encoreuneautredir dirwithoutpermissions
