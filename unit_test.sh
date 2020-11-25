@@ -57,10 +57,13 @@ TEST_ARRAY=(
 '################		    QUOTES			#################'
 'echo "$HOME"'
 "echo '\$HOME'"
+"echo ' \"\$HOME\" '"
+"echo \"'\$HOME'\""
 "echo \" '\$PWD' \\\"\$PWD\\\" '\$PWD' \"" "echo \"\\\$HOME\""
+"echo \"\\\''\'\""
 "echo \"'\$'\""
 "echo \\\\\n"
-"echo \"semicolon will not ; stop me\""
+"echo \"< no pipe | or semicolon will ; stop me >\""
 'bash -c "I am not a command" "Im the program name"'
 '################		    PIPES			#################'
 'echo 5 + 3 | bc'
@@ -133,7 +136,8 @@ printf "%s\n" "copying ${ROSITA}$(which ls)$NC to ${ROSITA}lscp$NC..."
 printf "\n\t\t\t    ${YELLOW}[ MINISHELL UNIT TEST ]$NC\n\n\n"
 
 
-
+TOTAL=0
+PASSED=0
 for val in "${TEST_ARRAY[@]}"
 do
     if [[ "$val" == *####* ]]; then
@@ -163,6 +167,7 @@ do
 
     if [[ "$DIFF" == "" && $RET1 == $RET2 ]]
     then
+	PASSED=$((PASSED+1))
 	printf "%-80s[PASS] [$NC" "${GREEN}$val"
     else
 	printf "%-80s[FAIL] [$NC" "${RED}$val"
@@ -191,7 +196,11 @@ do
 	else
 	    printf "${RED}]$NC\n"
     fi
+    TOTAL=$((TOTAL+1))
 done
+
+printf "\n\n\t${GREEN}$PASSED$NC tests ${GREEN}passed$NC from a total of $TOTAL tests"
+printf "  ||  ${GREEN}$PASSED passed$NC - ${RED}$((TOTAL - PASSED)) failed$NC"
 
 printf "\n\n\t\t\'cat diff.txt | less\'  for detailed information\n\n"
 
