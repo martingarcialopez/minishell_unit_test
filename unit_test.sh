@@ -147,6 +147,10 @@ do
     ./minishell -c "$val" > out2 2> err2
     RET2=$?
     rm -rf a b c d
+    sed -i "" 's/line 0: //' err1
+    if [[ $(cat out2) == "exit" ]];then
+	echo exit >> out1
+    fi
     DIFF=$(diff out1 out2) 
     ERRDIFF=$(diff err1 err2)
 
@@ -174,7 +178,7 @@ do
     else
 	printf "${MARRONMIERDA}FAIL$NC"
 	printf "%s\n" "$COLORBONITO----- STDERR -----$NC" >> diff.txt
-	diff -Bbw err1 err2 >> diff.txt
+	diff err1 err2 >> diff.txt
     fi
 
     if [[ "$DIFF" != "" || $RET1 != $RET2 || $ERRDIFF != ""  ]]
