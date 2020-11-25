@@ -151,7 +151,11 @@ do
     ./minishell -c "$val" > out2 2> err2
     RET2=$?
     rm -rf a b c d
-    sed -i "" 's/line 0: //' err1
+    if [[ $(uname) == "Darwin" ]]; then
+        sed -i "" 's/line 0: //' err1
+    else
+        sed -i 's/line 0: //' err1
+    fi
     if [[ $(cat out2) == "exit" ]];then
 	echo exit >> out1
     fi
