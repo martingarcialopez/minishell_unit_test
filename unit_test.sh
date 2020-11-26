@@ -51,6 +51,9 @@ TEST_ARRAY=(
 'cd dir ; ../lscp'
 'cd dir/encoreuneautredir ; ../../lscp'
 'df -h | head -2'
+'/'
+'./'
+'/.'
 'ls imnotaflag meneither'
 'idontexist'
 './meneither'
@@ -69,6 +72,8 @@ TEST_ARRAY=(
 "echo \\\\\n"
 "echo \"< no pipe | or semicolon will ; stop me >\""
 'bash -c "I am not a command" "Im the program name"'
+'echo\" asdasdasd\"$asdasd$HOME coucou'
+'\"asdasdasd\"$asdasd$HOME'
 '################		    PIPES			#################'
 'echo 5 + 3 | bc'
 'ls | wc | wc -l | bc'
