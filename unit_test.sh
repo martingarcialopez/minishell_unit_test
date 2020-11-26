@@ -15,6 +15,8 @@ TEST_ARRAY=(
 'export Z=z ; echo $Z'
 'export A=a B=b C=c; echo $A$B$C'
 'export zz zzz= zzzz=asd ; echo $zz$zzz$zzzz; export | grep zz'
+'export =a ; echo $a'
+'export $HOME=hola ; echo $HOME'
 #'export _=a; echo $_'
 'export A=a=a=a=a=a; echo $A'
 'export A B C; echo $A$B$C'
