@@ -4,6 +4,7 @@ TEST_ARRAY=(
 '##################		    BUILTINS			#################' # ${YELLOW}STDOUT STDERR$NC
 #### PWD ####
 'pwd'
+'pwd "useless argument"'
 'unset PWD ; pwd'
 #### ECHO ####
 'echo | cat -e'
