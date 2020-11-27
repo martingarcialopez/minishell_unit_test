@@ -104,9 +104,11 @@ TEST_ARRAY=(
 '################	    LEFT REDIRECTION		    #################'
 'echo pim pam > pum ; cat < pum'
 'touch a b c; echo sorry > d; cat < a < b < c < d'
-'cat < notexist'
-'pwd > a < b'
-'pwd < a > b'
+'echo ayayay > a ; cat < doesnotexist < a'
+'cat < doesnotexist'
+'cat < dir'
+'pwd > a < b ; ls ; cat a'
+'pwd < a > b ; ls ; cat b'
 )
 
 GREEN=$(tput setaf 2)
@@ -139,8 +141,10 @@ printf "copying your minishell to the current directory...\n"
 
 rm -rf diff.txt
 
-mkdir dir dir/encoreuneautredir
-printf "creating directories ${ROSITA}dir$NC, ${ROSITA}dir/encoreuneautredir$NC...\n"
+if  [[ ! -d dir || ! -d dir/encoreuneautredir ]]; then
+    mkdir dir dir/encoreuneautredir
+    printf "creating directories ${ROSITA}dir$NC, ${ROSITA}dir/encoreuneautredir$NC...\n"
+fi
 if [[ ! -d dirwithoutpermissions ]]; then
     mkdir -m 0000 dirwithoutpermissions
     printf "creating directory ${ROSITA}dirwithoutpermissions$NC...\n"
