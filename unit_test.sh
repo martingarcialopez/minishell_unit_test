@@ -11,7 +11,7 @@ TEST_ARRAY=(
 'echo hola buenos dias | cat -e'
 'echo -n hola que tal bocadillo digital | cat -e'
 #### ENV ####
-#'env'
+'env | grep USER'
 #### EXPORT ####
 'export Z=z ; echo $Z'
 'export A=a B=b C=c; echo $A$B$C'
@@ -19,7 +19,6 @@ TEST_ARRAY=(
 'export zz zzz= zzzz=asd ; echo $zz$zzz$zzzz; export | grep zz'
 'export =a ; echo $a'
 'export /dont/export/this=hola ; export | grep /dont/export/this'
-#'export _=a; echo $_'
 'export A=a=a=a=a=a; echo $A'
 'export A B C; echo $A$B$C'
 'export $'
@@ -133,7 +132,7 @@ make -C ..
 cp ../minishell .
 printf "copying your minishell to the current directory...\n"
 
-rm diff.txt
+rm -rf diff.txt
 
 mkdir dir dir/encoreuneautredir
 printf "creating directories ${ROSITA}dir$NC, ${ROSITA}dir/encoreuneautredir$NC...\n"
