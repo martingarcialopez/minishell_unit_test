@@ -101,7 +101,12 @@ TEST_ARRAY=(
 'notacommand >> a'
 'pwd >> dir'
 'ls >> a imnotaflag meneither'
-#'################	    LEFT REDIRECTION		    #################'
+'################	    LEFT REDIRECTION		    #################'
+'echo pim pam > pum ; cat < pum'
+'touch a b c; echo sorry > d; cat < a < b < c < d'
+'cat < notexist'
+'pwd > a < b'
+'pwd < a > b'
 )
 
 GREEN=$(tput setaf 2)
@@ -218,6 +223,6 @@ printf "  ||  ${GREEN}$PASSED passed$NC - ${RED}$((TOTAL - PASSED)) failed$NC"
 
 printf "\n\n\t\t\'cat diff.txt | less\'  for detailed information\n\n"
 
-rm -rf minishell out1 out2 err1 err2 a b c d lscp
+rm -rf minishell out1 out2 err1 err2 a b c d pum lscp
 chmod +r dirwithoutpermissions
 rm -rf ucantexecme.e dir dir/encoreuneautredir dirwithoutpermissions
