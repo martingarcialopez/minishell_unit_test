@@ -50,8 +50,6 @@ TEST_ARRAY=(
 'pwd'
 'echo $PWD'
 'cd .. ; echo $OLDPWD'
-'env | grep PWD'
-'cd .. ; env | grep OLDPWD'
 './lscp'
 '################		COMMAND EXECUTION	        #################'
 'ls'
