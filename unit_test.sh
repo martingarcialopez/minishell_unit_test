@@ -45,6 +45,14 @@ TEST_ARRAY=(
 'exit 512'
 'exit 1407'
 'exit 21 42'
+'################	NO ENVIRONMENT (env -i ./minishell)	#################'
+'cd'
+'pwd'
+'echo $PWD'
+'cd .. ; echo $OLDPWD'
+'env | grep PWD'
+'cd .. ; env | grep OLDPWD'
+'./lscp'
 '################		COMMAND EXECUTION	        #################'
 'ls'
 '/bin/ls'
@@ -157,17 +165,26 @@ printf "\n\t\t\t    ${YELLOW}[ MINISHELL UNIT TEST ]$NC\n\n\n"
 
 TOTAL=0
 PASSED=0
+ENV=""
 for val in "${TEST_ARRAY[@]}"
 do
-    if [[ "$val" == *####* ]]; then
+    if [[ "$val" = *ENVIRONMENT* ]]
+    then
+	ENV="env -i"
+    elif [[ "$val" = *EXECUTION* ]]
+    then
+	ENV=""
+    fi
+    if [[ "$val" = *####* ]]; then
 	printf "%s" "${NC}$val"
 	printf " ${COLORBONITO}STDERR$NC\n"
 	continue 
     fi
-    bash -c "$val" minishell > out1 2> err1
+    #printf "executing command $ENV bash -c \"$val\" minishell...\n"
+    $ENV bash -c "$val" minishell > out1 2> err1
     RET1=$?
     rm -rf a b c d
-    ./minishell -c "$val" > out2 2> err2
+    $ENV ./minishell -c "$val" > out2 2> err2
     RET2=$?
     rm -rf a b c d
     if [[ $(uname) == "Darwin" ]]; then
@@ -180,7 +197,6 @@ do
     fi
     DIFF=$(diff out1 out2) 
     ERRDIFF=$(diff err1 err2)
-
     if [[ "$DIFF" != "" || $RET1 != $RET2 || $ERRDIFF != ""  ]]
     then
 	printf "%s\n" "${YELLOW}$val$NC" >> diff.txt
