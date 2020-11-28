@@ -178,7 +178,6 @@ do
 	printf " ${COLORBONITO}STDERR$NC\n"
 	continue 
     fi
-    #printf "executing command $ENV bash -c \"$val\" minishell...\n"
     $ENV bash -c "$val" minishell > out1 2> err1
     RET1=$?
     rm -rf a b c d
@@ -197,7 +196,11 @@ do
     ERRDIFF=$(diff err1 err2)
     if [[ "$DIFF" != "" || $RET1 != $RET2 || $ERRDIFF != ""  ]]
     then
-	printf "%s\n" "${YELLOW}$val$NC" >> diff.txt
+	if [[ $ENV == "" ]]; then
+	    printf "%s\n" "${YELLOW}$val$NC" >> diff.txt
+	else
+	    printf "%s\n" "${YELLOW}$ENV ./minishell: $val$NC" >> diff.txt
+	fi
 	printf "${ROSITA}< bash       (exited with %d)$NC\n" "$RET1" >> diff.txt
 	printf "${ROSITA}> minishell  (exited with %d)\n$NC" "$RET2" >> diff.txt
     fi
