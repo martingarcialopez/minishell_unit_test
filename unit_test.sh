@@ -32,8 +32,8 @@ TEST_ARRAY=(
 'unset HOME ; cd ; pwd'
 'cd .; pwd'
 'cd ..; pwd'
-'cd ..; pwd; echo $OLDPWD'
-'unset OLDPWD; cd .. ; pwd; echo $OLDPWD'
+'cd ..; echo $OLDPWD; pwd'
+'unset OLDPWD; cd .. ; echo $OLDPWD; pwd'
 "cd ' /'; pwd"
 'cd ../../ ; pwd'
 'cd ../../../../../../.. ; pwd'
