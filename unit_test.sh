@@ -1,7 +1,7 @@
 #!/bin/bash
 
 TEST_ARRAY=(
-'##################		    BUILTINS			#################' # ${YELLOW}STDOUT STDERR$NC
+'##################		    BUILTINS			#################'
 #### PWD ####
 'pwd'
 'pwd "useless argument"'
@@ -68,7 +68,7 @@ TEST_ARRAY=(
 './meneither'
 './dir'
 'touch ucantexecme.e ; chmod 000 ucantexecme.e ; ./ucantexecme.e'
-'################		    PARSING		        #################'
+'################   		SYNTAX ERRORS			#################'
 ';'
 '|'
 '|b'
@@ -128,20 +128,102 @@ TEST_ARRAY=(
 'pwd < a > b ; ls ; cat b'
 )
 
+usage() {
+    printf "usage: ./unit_test.sh [--help | -h] [--no-error | -n] [--builtins | -b] [--no-environment | -e]\n"
+    printf "                      [--cmd-execution | -c] [--syntax-error | -s] [--quotes | -q] [--pipes | -p]\n"
+    printf "                      [--right-redirection | -r] [--left-redirection | -l] [--double-redirection | -d]\n"
+    exit
+}
+
 GREEN=$(tput setaf 2)
 RED=$(tput setaf 1)
 YELLOW=$(tput setaf 3)
 ROSITA=$(tput setaf 5)
 BLUE=$(tput setaf 4)
-VERDEKTSALTAALACARA=$(tput setaf 10)
-ROJOKTSALTAALACARA=$(tput setaf 196)
 MARRONMIERDA=$(tput setaf 8)
 COLORBONITO=$(tput setaf 12)
 NC=$(tput sgr0)
 
+HELP=0
+ERROR=1
+DFL_TEST=1
+TO_TEST=()
+OTHER_ARGUMENTS=()
+for arg in "$@"
+do
+    case $arg in
+	-h|--help)
+	HELP=1
+	shift
+	;;
+        -n|--no-error)
+	ERROR=0
+        shift
+        ;;
+	-b|--builtins)
+	DFL_TEST=0
+	TO_TEST+=('BUILTINS')
+	shift
+	;;
+	-e|--no-environment)
+	DFL_TEST=0
+	TO_TEST+=('ENVIRONMENT')
+	shift
+	;;
+	-c|--cmd-execution)
+	DFL_TEST=0
+	TO_TEST+=('EXECUTION')
+	shift
+	;;
+	-s|--syntax-error)
+	DFL_TEST=0
+	TO_TEST+=('SYNTAX')
+	shift
+	;;
+	-q|--quotes)
+	DFL_TEST=0
+	TO_TEST+=('QUOTES')
+	shift
+	;;
+	-p|--pipes)
+	DFL_TEST=0
+	TO_TEST+=('PIPES')
+	shift
+	;;
+	-r|--right-redirection)
+	DFL_TEST=0
+	TO_TEST+=('RIGHT')
+	shift
+	;;
+	-l|--left-redirection)
+	DFL_TEST=0
+	TO_TEST+=('LEFT')
+	shift
+	;;
+	-d|--double-redirection)
+	DFL_TEST=0
+	TO_TEST+=('DOUBLE')
+	shift
+	;;
+	*)
+	OTHER_ARGUMENTS+=("$1")
+        shift
+        ;;
+    esac
+done
 
-if [[ ! -f ../Makefile ]]; then
-    printf "${RED}Error:$NC There is no Makefile to build your minishell in ../"
+for args in ${OTHER_ARGUMENTS[@]}
+do
+    printf "${RED}Error:$NC $args: not a valid option\n\n"
+    usage
+done
+
+if [[ $HELP -eq 1 ]]
+then
+    usage
+fi
+
+if [[ ! -f ../Makefile ]]; then printf "${RED}Error:$NC There is no Makefile to build your minishell in ../"
     printf "\nMake sure to clone this repo in the root of your project\n"
     printf "\n${RED}aborting test...\n\n$NC"
     exit 1
@@ -169,20 +251,6 @@ fi
 cp $(which ls) lscp
 printf "%s\n" "copying ${ROSITA}$(which ls)$NC to ${ROSITA}lscp$NC..."
 
-
-ERROR=1
-
-for arg in "$@"
-do
-    case $arg in
-        -n|--no-error)
-	ERROR=0
-        shift
-        ;;
-    esac
-done
-
-
 printf "\n\t\t\t    ${YELLOW}[ MINISHELL UNIT TEST ]$NC\n\n\n"
 
 
@@ -197,13 +265,35 @@ do
     then
 	ENV=""
     fi
-    if [[ "$val" = *####* ]]; then
-	printf "%s" "${NC}$val"
-	if [[ $ERROR == 1 ]]; then
+    if [[ "$val" = *####* ]]
+    then
+	if [[ DFL_TEST -eq 1 ]]; then
+	    printf "%s" "${NC}$val"
+	else
+	    TEST_SECTION=0
+	    for section in ${TO_TEST[@]}
+	    do
+		if [[ "$val" = *$section* ]]; then
+		    printf "%s" "${NC}$val"
+		    TEST_SECTION=1
+		    if [[ $ERROR == 1 ]]; then
+			printf " ${COLORBONITO}STDERR$NC"
+		    fi
+		    continue;
+		fi
+	    done
+	fi
+	if [[ $ERROR == 1 && $DFL_TEST == 1 ]]; then
 	    printf " ${COLORBONITO}STDERR$NC"
 	fi
-	printf "\n"
+	if [[ $DFL_TEST == 1 || $TEST_SECTION == 1 ]]; then
+	    printf "\n"
+	fi
 	continue 
+    fi
+    if [[ $DFL_TEST -eq 0 && $TEST_SECTION -eq 0 ]]
+    then
+	continue
     fi
     TESTOK=0
     $ENV bash -c "$val" minishell > out1 2> err1
