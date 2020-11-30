@@ -45,6 +45,7 @@ TEST_ARRAY=(
 'exit 512'
 'exit 1407'
 'exit 21 42'
+'exit notanumber'
 '################	NO ENVIRONMENT (env -i ./minishell)	#################'
 'cd'
 'pwd'
@@ -59,15 +60,24 @@ TEST_ARRAY=(
 'cd dir/encoreuneautredir ; ../../lscp'
 'df -h | head -2'
 '/'
-'./'
-'/.'
+'../'
+'/..'
+'..'
 'ls imnotaflag meneither'
 'idontexist'
 './meneither'
 './dir'
 'touch ucantexecme.e ; chmod 000 ucantexecme.e ; ./ucantexecme.e'
-#'################		    PARSING		        #################'
-#';'
+'################		    PARSING		        #################'
+';'
+'|'
+'|b'
+'a|||b'
+'>>> a'
+'<<< a'
+'a<<<<'
+'pwd >;'
+'pwd ;;'
 '################		    QUOTES			#################'
 'echo "$HOME"'
 "echo '\$HOME'"
@@ -109,6 +119,7 @@ TEST_ARRAY=(
 'ls >> a imnotaflag meneither'
 '################	    LEFT REDIRECTION			#################'
 'echo pim pam > pum ; cat < pum'
+'echo ayayay > a; echo im a butterfly > b ; cat < a < b'
 'touch a b c; echo sorry > d; cat < a < b < c < d'
 'echo ayayay > a ; cat < doesnotexist < a'
 'cat < doesnotexist'
@@ -158,11 +169,24 @@ fi
 cp $(which ls) lscp
 printf "%s\n" "copying ${ROSITA}$(which ls)$NC to ${ROSITA}lscp$NC..."
 
+
+ERROR=1
+
+for arg in "$@"
+do
+    case $arg in
+        -n|--no-error)
+	ERROR=0
+        shift
+        ;;
+    esac
+done
+
+
 printf "\n\t\t\t    ${YELLOW}[ MINISHELL UNIT TEST ]$NC\n\n\n"
 
 
 TOTAL=0
-PASSED=0
 ENV=""
 for val in "${TEST_ARRAY[@]}"
 do
@@ -175,9 +199,13 @@ do
     fi
     if [[ "$val" = *####* ]]; then
 	printf "%s" "${NC}$val"
-	printf " ${COLORBONITO}STDERR$NC\n"
+	if [[ $ERROR == 1 ]]; then
+	    printf " ${COLORBONITO}STDERR$NC"
+	fi
+	printf "\n"
 	continue 
     fi
+    TESTOK=0
     $ENV bash -c "$val" minishell > out1 2> err1
     RET1=$?
     rm -rf a b c d
@@ -194,7 +222,10 @@ do
     fi
     DIFF=$(diff out1 out2) 
     ERRDIFF=$(diff err1 err2)
-    if [[ "$DIFF" != "" || $RET1 != $RET2 || $ERRDIFF != ""  ]]
+    if [[ "$DIFF" == "" && $RET1 == $RET2 ]]; then
+	TESTOK=1
+    fi
+    if [[ $TESTOK == 0 || ($ERROR == 1 && $ERRDIFF != "" ) ]]
     then
 	if [[ $ENV == "" ]]; then
 	    printf "%s\n" "${YELLOW}$val$NC" >> diff.txt
@@ -205,37 +236,43 @@ do
 	printf "${ROSITA}> minishell  (exited with %d)\n$NC" "$RET2" >> diff.txt
     fi
 
-    if [[ "$DIFF" == "" && $RET1 == $RET2 ]]
+    if [[ $TESTOK == 1 ]]
     then
 	PASSED=$((PASSED+1))
-	printf "%-80s[PASS] [$NC" "${GREEN}$val"
+	printf "%-80s[PASS]$NC" "${GREEN}$val"
     else
-	printf "%-80s[FAIL] [$NC" "${RED}$val"
+	printf "%-80s[FAIL]$NC" "${RED}$val"
 	if [[ "$DIFF" != "" ]]; then
 		printf "%s\n" "${COLORBONITO}----- STDOUT -----$NC" >> diff.txt
 		diff out1 out2 >> diff.txt
 	fi
     fi
 
-    if [[ "$ERRDIFF" == "" ]]
+    if [[ $ERROR == 1 && "$ERRDIFF" == "" ]]
     then
-	printf "    "
-    else
-	printf "${MARRONMIERDA}FAIL$NC"
+	if [[ $TESTOK == 1 ]]; then
+	    printf "${GREEN} [    ]$NC\n"
+	else
+	    printf "${RED} [    ]$NC\n"
+	fi
+    elif [[ $ERROR == 1 && "$ERRDIFF" != "" ]]
+    then
+	if [[ $TESTOK == 1 ]]; then
+	    printf "${GREEN} [${MARRONMIERDA}FAIL${GREEN}]$NC\n"
+	else
+	    printf "${RED} [${MARRONMIERDA}FAIL${RED}]$NC\n"
+	fi
 	printf "%s\n" "$COLORBONITO----- STDERR -----$NC" >> diff.txt
 	diff err1 err2 >> diff.txt
+    else
+	printf "\n"
     fi
 
-    if [[ "$DIFF" != "" || $RET1 != $RET2 || $ERRDIFF != ""  ]]
+    if [[ "$DIFF" != "" || $RET1 != $RET2 || ($ERROR == 1 && $ERRDIFF != "") ]]
     then
 	printf "\n\n" >> diff.txt
     fi
 
-    if [[ "$DIFF" == "" && $RET1 == $RET2 ]]; then
-	    printf "${GREEN}]$NC\n"
-	else
-	    printf "${RED}]$NC\n"
-    fi
     TOTAL=$((TOTAL+1))
 done
 
