@@ -15,7 +15,6 @@ TEST_ARRAY=(
 #### EXPORT ####
 'export Z=z ; echo $Z'
 'export A=a B=b C=c; echo $A$B$C'
-'export A=mi-moto B=alpino C=derrapante; echo $A$B$C'
 'export zz zzz= zzzz=asd ; echo $zz$zzz$zzzz; export | grep zz'
 'export =a ; echo $a'
 'export /dont/export/this=hola ; export | grep /dont/export/this'
@@ -73,10 +72,14 @@ TEST_ARRAY=(
 '|'
 '|b'
 'a|||b'
+'> > a'
+'< < a'
+'< >> a'
 '>>> a'
-'<<< a'
+'<<<< a'
 'a<<<<'
 'pwd >;'
+';pwd'
 'pwd ;;'
 '################		    QUOTES			#################'
 'echo "$HOME"'
@@ -84,7 +87,6 @@ TEST_ARRAY=(
 "echo ' \"\$HOME\" '"
 "echo \"'\$HOME'\""
 "echo \" '\$PWD' \\\"\$PWD\\\" '\$PWD' \"" "echo \"\\\$HOME\""
-#"echo \"\\\''\'\""
 "echo \"'\$'\""
 "echo \\\\\n"
 "echo \"< no pipe | or semicolon will ; stop me >\""
@@ -118,10 +120,12 @@ TEST_ARRAY=(
 'pwd >> dir'
 'ls >> a imnotaflag meneither'
 '################	    LEFT REDIRECTION			#################'
+'touch a ; < a'
 'echo pim pam > pum ; cat < pum'
 'echo ayayay > a; echo im a butterfly > b ; cat < a < b'
 'touch a b c; echo sorry > d; cat < a < b < c < d'
 'echo ayayay > a ; cat < doesnotexist < a'
+'< doesnotexist'
 'cat < doesnotexist'
 'cat < dir'
 'pwd > a < b ; ls ; cat a'
@@ -367,7 +371,12 @@ do
 done
 
 printf "\n\n\t${GREEN}$PASSED$NC tests ${GREEN}passed$NC from a total of $TOTAL tests"
-printf "  ||  ${GREEN}$PASSED passed$NC - ${RED}$((TOTAL - PASSED)) failed$NC"
+printf "  ||  ${GREEN}$PASSED passed$NC - "
+if [[ $((TOTAL - PASSED)) == 0 ]]; then
+	printf "${GREEN}$((TOTAL - PASSED)) failed$NC"
+else
+	printf "${RED}$((TOTAL - PASSED)) failed$NC"
+fi
 
 printf "\n\n\t\t\'cat diff.txt | less\'  for detailed information\n\n"
 
