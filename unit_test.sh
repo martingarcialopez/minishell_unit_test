@@ -128,8 +128,6 @@ TEST_ARRAY=(
 '< doesnotexist'
 'cat < doesnotexist'
 'cat < dir'
-'pwd > a < b ; ls ; cat a'
-'pwd < a > b ; ls ; cat b'
 )
 
 usage() {
@@ -308,8 +306,12 @@ do
     rm -rf a b c d
     if [[ $(uname) == "Darwin" ]]; then
         sed -i "" 's/line 0: //' err1
+	#	sed -i "" 's/.*minishell: -c: `.*//' err1
+	#	sed -i "" 's/ -c://' err1
     else
         sed -i 's/line 0: //' err1
+	#	sed -i 's/.*minishell: -c: `.*//' err1
+	#	sed -i 's/ -c://' err1
     fi
     if [[ $(cat out2) == "exit" ]];then
 	echo exit >> out1
