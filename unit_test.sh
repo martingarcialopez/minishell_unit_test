@@ -230,13 +230,15 @@ if [[ ! -f ../Makefile ]]; then printf "${RED}Error:$NC There is no Makefile to 
     printf "\n${RED}aborting test...\n\n$NC"
     exit 1
 fi
+
+make -C ..
+
 if [[ ! -f ../minishell ]]; then
     printf "${RED}Error:$NC There is no executable called minishell in ../"
     printf "\n\n${RED}aborting test...\n\n$NC"
     exit 1 
 fi
 
-make -C ..
 cp ../minishell .
 printf "copying your minishell to the current directory...\n"
 
@@ -255,6 +257,10 @@ printf "%s\n" "copying ${ROSITA}$(which ls)$NC to ${ROSITA}lscp$NC..."
 
 printf "\n\t\t\t    ${YELLOW}[ MINISHELL UNIT TEST ]$NC\n\n\n"
 
+KEYWORD=esternocleidomastoideo ###############
+echo "echo $KEYWORD" > testfile #############
+./minishell < testfile > hpc ###############
+sed "s/$KEYWORD//" hpc > hp #################
 
 TOTAL=0
 ENV=""
@@ -297,13 +303,21 @@ do
     then
 	continue
     fi
+	echo "$val" > testfile ########
     TESTOK=0
     $ENV bash -c "$val" minishell > out1 2> err1
     RET1=$?
     rm -rf a b c d
-    $ENV ./minishell -c "$val" > out2 2> err2
+    $ENV ./minishell < testfile > out2 2> err2 ###########
     RET2=$?
-    rm -rf a b c d
+	awk 'NR==FNR{a[$0]=1;next}!a[$0]' out2 hp > p #############3
+	printf "${YELLOW}p is$NC $(cat p)\n" ##################
+	awk 'NR==FNR{a[$0]=1;next}!a[$0]' hp out2 > pc ##############
+	printf "${YELLOW}pc is$NC $(cat pc)\n" ##################
+	printf "${YELLOW}out2 was$NC\n $(cat out2)\n" ##############
+	sed "s/$(cat p)//" pc > out2 ################### 
+	printf "${YELLOW}now out2 is$NC $(cat out2)\n" ####################
+    rm -rf a b c d p pc ###############
     if [[ $(uname) == "Darwin" ]]; then
         sed -i "" 's/line 0: //' err1
 	#	sed -i "" 's/.*minishell: -c: `.*//' err1
@@ -348,8 +362,7 @@ do
     then
 	if [[ $TESTOK == 1 ]]; then
 	    printf "${GREEN} [    ]$NC\n"
-	else
-	    printf "${RED} [    ]$NC\n"
+	else printf "${RED} [    ]$NC\n"
 	fi
     elif [[ $ERROR == 1 && "$ERRDIFF" != "" ]]
     then
@@ -382,6 +395,6 @@ fi
 
 printf "\n\n\t\t\'cat diff.txt | less\'  for detailed information\n\n"
 
-rm -rf minishell out1 out2 err1 err2 a b c d pum lscp
+rm -rf minishell out1 out2 err1 err2 a b c d pum lscp hpc hp testfile
 chmod +r dirwithoutpermissions
 rm -rf ucantexecme.e dir dir/encoreuneautredir dirwithoutpermissions
