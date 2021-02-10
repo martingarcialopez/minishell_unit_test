@@ -257,10 +257,10 @@ printf "%s\n" "copying ${ROSITA}$(which ls)$NC to ${ROSITA}lscp$NC..."
 
 printf "\n\t\t\t    ${YELLOW}[ MINISHELL UNIT TEST ]$NC\n\n\n"
 
-KEYWORD=esternocleidomastoideo ###############
-echo "echo $KEYWORD" > testfile #############
-./minishell < testfile > hpc ###############
-sed "s/$KEYWORD//" hpc > hp #################
+#KEYWORD=esternocleidomastoideo ###############
+#echo "echo $KEYWORD" > testfile #############
+#./minishell < testfile > hpc ###############
+#sed "s/$KEYWORD//" hpc > hp #################
 
 TOTAL=0
 ENV=""
@@ -303,20 +303,20 @@ do
     then
 	continue
     fi
-	echo "$val" > testfile ########
+#	echo "$val" > testfile ########
     TESTOK=0
     $ENV bash -c "$val" minishell > out1 2> err1
     RET1=$?
     rm -rf a b c d
-    $ENV ./minishell < testfile > out2 2> err2 ###########
+    $ENV ./minishell -c "$val" > out2 2> err2 ######   #####
     RET2=$?
-	awk 'NR==FNR{a[$0]=1;next}!a[$0]' out2 hp > p #############3
-	printf "${YELLOW}p is$NC $(cat p)\n" ##################
-	awk 'NR==FNR{a[$0]=1;next}!a[$0]' hp out2 > pc ##############
-	printf "${YELLOW}pc is$NC $(cat pc)\n" ##################
-	printf "${YELLOW}out2 was$NC\n $(cat out2)\n" ##############
-	sed "s/$(cat p)//" pc > out2 ################### 
-	printf "${YELLOW}now out2 is$NC $(cat out2)\n" ####################
+#	awk 'NR==FNR{a[$0]=1;next}!a[$0]' out2 hp > p #############3
+#	printf "${YELLOW}p is$NC $(cat p)\n" ##################
+#	awk 'NR==FNR{a[$0]=1;next}!a[$0]' hp out2 > pc ##############
+#	printf "${YELLOW}pc is$NC $(cat pc)\n" ##################
+#	printf "${YELLOW}out2 was$NC\n $(cat out2)\n" ##############
+#	sed "s/$(cat p)//" pc > out2 ################### 
+#	printf "${YELLOW}now out2 is$NC $(cat out2)\n" ####################
     rm -rf a b c d p pc ###############
     if [[ $(uname) == "Darwin" ]]; then
         sed -i "" 's/line 0: //' err1

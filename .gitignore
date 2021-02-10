@@ -1,2 +1,4 @@
+.gitignore
 diff.txt
+test.sh
 *.swp
