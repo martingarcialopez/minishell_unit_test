@@ -119,7 +119,7 @@ TEST_ARRAY=(
 'notacommand >> a'
 'pwd >> dir'
 'ls >> a imnotaflag meneither'
-'################	    LEFT REDIRECTION			#################'
+'################	    	LEFT REDIRECTION		#################'
 'touch a ; < a'
 'echo pim pam > pum ; cat < pum'
 'echo ayayay > a; echo im a butterfly > b ; cat < a < b'
